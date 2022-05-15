@@ -13,8 +13,7 @@ namespace Movies.API.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
-    //[Authorize("ClientIdPolicy")]
+    [Authorize("ClientIdPolicy")]
     public class MoviesController : ControllerBase
     {
 
