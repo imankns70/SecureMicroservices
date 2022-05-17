@@ -13,17 +13,7 @@ namespace IdentityServer
         public static IEnumerable<Client> Clients =>
             new Client[]
             {
-                   new Client
-                   {
-                        ClientId = "movieClient",
-                        AllowedGrantTypes = GrantTypes.ClientCredentials,
-                        ClientSecrets =
-                        {
-                            new Secret("secret".Sha256())
-                        },
-                        AllowedScopes = { "movieAPI" }
-                   },
-                   new Client
+                new Client
                    {
                        ClientId = "movies_mvc_client",
                        ClientName = "Movies MVC Web App",
@@ -46,15 +36,27 @@ namespace IdentityServer
                        {
                            IdentityServerConstants.StandardScopes.OpenId,
                            IdentityServerConstants.StandardScopes.Profile,
-                           IdentityServerConstants.StandardScopes.Address,
-                           IdentityServerConstants.StandardScopes.Email,
-                           "movieAPI",
-                           "roles"
+                           //IdentityServerConstants.StandardScopes.Address,
+                           //IdentityServerConstants.StandardScopes.Email,
+                           //"movieAPI",
+                           //"roles"
                        }
-                   }
+                   },
+                   //new Client
+                   //{
+                   //     ClientName="Movies Api",
+                   //     ClientId = "movieClient",
+                   //     AllowedGrantTypes = GrantTypes.ClientCredentials,
+                   //     ClientSecrets =
+                   //     {
+                   //         new Secret("secret".Sha256())
+                   //     },
+                   //     AllowedScopes = { "movieAPI" }
+                   //}
+                   
             };
 
-        public static IEnumerable<ApiScope> ApiScopes =>
+public static IEnumerable<ApiScope> ApiScopes =>
            new ApiScope[]
            {
                new ApiScope("movieAPI", "Movie API")
@@ -63,7 +65,7 @@ namespace IdentityServer
         public static IEnumerable<ApiResource> ApiResources =>
           new ApiResource[]
           {
-               //new ApiResource("movieAPI", "Movie API")
+              new ApiResource("movieAPI", "Movie API")
           };
 
         public static IEnumerable<IdentityResource> IdentityResources =>
@@ -71,12 +73,12 @@ namespace IdentityServer
           {
               new IdentityResources.OpenId(),
               new IdentityResources.Profile(),
-              new IdentityResources.Address(),
-              new IdentityResources.Email(),
-              new IdentityResource(
-                    "roles",
-                    "Your role(s)",
-                    new List<string>() { "role" })
+              //new IdentityResources.Address(),
+              //new IdentityResources.Email(),
+              //new IdentityResource(
+              //      "roles",
+              //      "Your role(s)",
+              //      new List<string>() { "role" })
           };
 
         public static List<TestUser> TestUsers =>
@@ -85,12 +87,23 @@ namespace IdentityServer
                 new TestUser
                 {
                     SubjectId = "5BE86359-073C-434B-AD2D-A3932222DABE",
-                    Username = "mehmet",
-                    Password = "swn",
+                    Username = "KNS70",
+                    Password = "123456",
                     Claims = new List<Claim>
                     {
-                        new Claim(JwtClaimTypes.GivenName, "mehmet"),
-                        new Claim(JwtClaimTypes.FamilyName, "ozkaya")
+                        new Claim(JwtClaimTypes.GivenName, "iman"),
+                        new Claim(JwtClaimTypes.FamilyName, "solouki")
+                    }
+                },
+                new TestUser
+                {
+                    SubjectId = "b7539694-97e7-4dfe-84da-b4256e1ff5c7",
+                    Username = "MGH",
+                    Password = "654321",
+                    Claims = new List<Claim>
+                    {
+                        new Claim(JwtClaimTypes.GivenName, "mohsen"),
+                        new Claim(JwtClaimTypes.FamilyName, "ghalavand")
                     }
                 }
             };

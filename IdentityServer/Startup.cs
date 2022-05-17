@@ -22,11 +22,11 @@ namespace IdentityServer
             services.AddControllersWithViews();
 
             services.AddIdentityServer()
-                .AddInMemoryClients(Config.Clients)
-                .AddInMemoryApiScopes(Config.ApiScopes)
-                .AddInMemoryIdentityResources(Config.IdentityResources)
+                .AddDeveloperSigningCredential()
                 .AddTestUsers(Config.TestUsers)
-                .AddDeveloperSigningCredential();
+                .AddInMemoryIdentityResources(Config.IdentityResources)
+                .AddInMemoryClients(Config.Clients);
+                //.AddInMemoryApiScopes(Config.ApiScopes)
              
         }
 
@@ -41,9 +41,10 @@ namespace IdentityServer
             app.UseStaticFiles();
 
             app.UseRouting();
+
             app.UseIdentityServer();
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
