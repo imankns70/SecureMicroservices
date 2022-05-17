@@ -15,7 +15,7 @@ using Movies.Client.Models;
 
 namespace Movies.Client.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class MoviesController : Controller
     {
         private readonly IMovieApiService _movieApiService;
@@ -28,7 +28,7 @@ namespace Movies.Client.Controllers
         // GET: Movies
         public async Task<IActionResult> Index()
         {
-            await LogTokenAndClaims();
+            //await LogTokenAndClaims();
             return View(await _movieApiService.GetMovies());
         }
         public async Task LogTokenAndClaims()
