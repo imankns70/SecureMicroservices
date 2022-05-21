@@ -73,7 +73,7 @@ public static IEnumerable<ApiScope> ApiScopes =>
           {
               new IdentityResources.OpenId(),
               new IdentityResources.Profile(),
-              //new IdentityResources.Address(),
+              new IdentityResources.Address(),
               //new IdentityResources.Email(),
               //new IdentityResource(
               //      "roles",
@@ -92,7 +92,8 @@ public static IEnumerable<ApiScope> ApiScopes =>
                     Claims = new List<Claim>
                     {
                         new Claim(JwtClaimTypes.GivenName, "iman"),
-                        new Claim(JwtClaimTypes.FamilyName, "solouki")
+                        new Claim(JwtClaimTypes.FamilyName, "solouki"),
+                        new Claim(JwtClaimTypes.Address, "kian shahr 1")
                     }
                 },
                 new TestUser
@@ -103,7 +104,8 @@ public static IEnumerable<ApiScope> ApiScopes =>
                     Claims = new List<Claim>
                     {
                         new Claim(JwtClaimTypes.GivenName, "mohsen"),
-                        new Claim(JwtClaimTypes.FamilyName, "ghalavand")
+                        new Claim(JwtClaimTypes.FamilyName, "ghalavand"),
+                        new Claim(JwtClaimTypes.Address, "kian shahr 2")
                     }
                 }
             };
