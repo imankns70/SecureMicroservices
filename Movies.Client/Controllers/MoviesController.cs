@@ -15,7 +15,7 @@ using Movies.Client.Models;
 
 namespace Movies.Client.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class MoviesController : Controller
     {
         private readonly IMovieApiService _movieApiService;
@@ -190,12 +190,7 @@ namespace Movies.Client.Controllers
             //return _context.Movie.Any(e => e.Id == id);
         }
 
-        public async Task Logout()
-        {
-           
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
-        }
+       
 
     }
 }

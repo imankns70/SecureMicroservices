@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Movies.Client.Models;
@@ -8,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Movies.Client.Controllers
@@ -16,16 +21,28 @@ namespace Movies.Client.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        public readonly IConfiguration _configuration;
+        private readonly IHttpClientFactory _clientFactory;
 
-        
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, IHttpClientFactory clientFactory)
         {
             _logger = logger;
+            _configuration = configuration;
+            _clientFactory = clientFactory;
         }
 
         public async Task<IActionResult> Index()
         {
             await WriteOutIdentityInformation();
+
+            
+            //var metaDataResponse = await client.;
+
+            //OpenIdConnectParameterNames.AccessToken
+            //metaDataResponse.
+
+
+
             return View();
         }
 
@@ -40,8 +57,7 @@ namespace Movies.Client.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-<<<<<<< HEAD
-=======
+ 
         public async Task WriteOutIdentityInformation()
         {
             var identityToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.IdToken);
@@ -55,6 +71,13 @@ namespace Movies.Client.Controllers
                 Debug.WriteLine($"Claim type: {claim.Type} - Claim value: {claim.Value}");
             }
         }
->>>>>>> 50e0fd7986983f9cb454e21f566a164d2b86df83
+
+        public async Task Logout()
+        {
+
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+        }
+
     }
 }
