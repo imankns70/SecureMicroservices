@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Movies.Client.Models;
 using System;
 using System.Collections.Generic;
@@ -9,17 +12,20 @@ using System.Threading.Tasks;
 
 namespace Movies.Client.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
 
+        
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            await WriteOutIdentityInformation();
             return View();
         }
 
@@ -34,5 +40,21 @@ namespace Movies.Client.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+<<<<<<< HEAD
+=======
+        public async Task WriteOutIdentityInformation()
+        {
+            var identityToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.IdToken);
+
+            //ILogger is for kestrel console
+            // Debug is for visual studio console window
+            Debug.WriteLine($"Identity token: {identityToken}");
+
+            foreach (var claim in User.Claims)
+            {
+                Debug.WriteLine($"Claim type: {claim.Type} - Claim value: {claim.Value}");
+            }
+        }
+>>>>>>> 50e0fd7986983f9cb454e21f566a164d2b86df83
     }
 }
