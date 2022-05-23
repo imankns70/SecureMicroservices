@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace Movies.Client.ApiServices
 {
@@ -17,11 +18,14 @@ namespace Movies.Client.ApiServices
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        public readonly IConfiguration _configuration;
 
-        public MovieApiService(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
+        public MovieApiService(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor,
+            IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<Movie>> GetMovies()
@@ -92,9 +96,9 @@ namespace Movies.Client.ApiServices
 
         public async Task<UserInfoViewModel> GetUserInfo()
         {
-            var idpClient = _httpClientFactory.CreateClient("IDPClient");
+            var idpClient = _httpClientFactory.CreateClient();
 
-            var metaDataResponse = await idpClient.GetDiscoveryDocumentAsync();
+            var metaDataResponse = await idpClient.GetDiscoveryDocumentAsync(_configuration["IDP_EndPoint"]);
 
             if (metaDataResponse.IsError)
             {

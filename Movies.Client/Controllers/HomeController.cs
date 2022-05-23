@@ -65,7 +65,7 @@ namespace Movies.Client.Controllers
             //ILogger is for kestrel console
             // Debug is for visual studio console window
             Debug.WriteLine($"Identity token: {identityToken}");
-
+            var fff = User.IsInRole("admin");
             foreach (var claim in User.Claims)
             {
                 Debug.WriteLine($"Claim type: {claim.Type} - Claim value: {claim.Value}");

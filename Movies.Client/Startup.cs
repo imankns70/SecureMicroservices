@@ -81,8 +81,10 @@ namespace Movies.Client
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
               
             })
-                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
-              
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                {
+                    options.AccessDeniedPath = "/Authorization/AccessDenied";
+                })              
                 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
          
                 {
@@ -96,7 +98,7 @@ namespace Movies.Client
                     options.Scope.Add("profile");
                     options.Scope.Add("address");
                     //options.Scope.Add("email");
-                    //options.Scope.Add("roles");
+                    options.Scope.Add("roles");
 
                     options.ClaimActions.DeleteClaim("address");
                     //options.ClaimActions.DeleteClaim("sid");
@@ -104,18 +106,28 @@ namespace Movies.Client
                     //options.ClaimActions.DeleteClaim("s_hash");
                     //options.ClaimActions.DeleteClaim("auth_time");
                     
-                    //options.ClaimActions.MapUniqueJsonKey("role", "role");
+
+                    // چون جزو کلیم های دیفالت نیست مجبوریم دستی آن را اضافه کنیم
+                    options.ClaimActions.MapUniqueJsonKey("role", "role");
+
+
+                    // for having 2 or more roles
+                    //options.ClaimActions.MapJsonKey(claimType: "role", jsonKey: "role"); 
+
+
 
                     //options.Scope.Add("movieAPI");
 
                     options.SaveTokens = true;
                     options.GetClaimsFromUserInfoEndpoint = true;
 
-                    //options.TokenValidationParameters = new TokenValidationParameters
-                    //{
-                    //    NameClaimType = JwtClaimTypes.GivenName,
-                    //    RoleClaimType = JwtClaimTypes.Role
-                    //};
+
+                    // به اطلاع رساندن کاربر جاری تا نقش را از کلیم جاری بخواند
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        NameClaimType = JwtClaimTypes.GivenName,
+                        RoleClaimType = JwtClaimTypes.Role
+                    };
                 });
         }
 

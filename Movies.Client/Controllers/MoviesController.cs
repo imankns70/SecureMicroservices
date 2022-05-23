@@ -15,7 +15,7 @@ using Movies.Client.Models;
 
 namespace Movies.Client.Controllers
 {
-    [Authorize]
+    [Authorize(Roles ="admin")]
     public class MoviesController : Controller
     {
         private readonly IMovieApiService _movieApiService;

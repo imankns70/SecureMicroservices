@@ -39,7 +39,7 @@ namespace IdentityServer
                            IdentityServerConstants.StandardScopes.Address,
                            //IdentityServerConstants.StandardScopes.Email,
                            //"movieAPI",
-                           //"roles"
+                           "roles"
                        }
                    },
                    //new Client
@@ -75,10 +75,10 @@ public static IEnumerable<ApiScope> ApiScopes =>
               new IdentityResources.Profile(),
               new IdentityResources.Address(),
               //new IdentityResources.Email(),
-              //new IdentityResource(
-              //      "roles",
-              //      "Your role(s)",
-              //      new List<string>() { "role" })
+              new IdentityResource(
+                    "roles",
+                    "Your role(s)",
+                    new List<string>() { "role" })
           };
 
         public static List<TestUser> TestUsers =>
@@ -93,7 +93,10 @@ public static IEnumerable<ApiScope> ApiScopes =>
                     {
                         new Claim(JwtClaimTypes.GivenName, "iman"),
                         new Claim(JwtClaimTypes.FamilyName, "solouki"),
-                        new Claim(JwtClaimTypes.Address, "kian shahr 1")
+                        new Claim(JwtClaimTypes.Address, "kian shahr 1"),
+                        new Claim(JwtClaimTypes.Role, "admin")
+                        
+                        
                     }
                 },
                 new TestUser
@@ -105,7 +108,8 @@ public static IEnumerable<ApiScope> ApiScopes =>
                     {
                         new Claim(JwtClaimTypes.GivenName, "mohsen"),
                         new Claim(JwtClaimTypes.FamilyName, "ghalavand"),
-                        new Claim(JwtClaimTypes.Address, "kian shahr 2")
+                        new Claim(JwtClaimTypes.Address, "kian shahr 2"),
+                        new Claim(JwtClaimTypes.Role, "b1 user")
                     }
                 }
             };

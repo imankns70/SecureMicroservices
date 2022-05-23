@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <StartupObject>Movies.Client.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
