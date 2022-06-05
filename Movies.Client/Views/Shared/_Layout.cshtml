@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -41,6 +43,17 @@
                             </li>
                         }
 
+                        @if (User.IsInRole("b1_user"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Movies" asp-action="OnlyAdmin">your role is b1_user</a>
+                            </li>
+                        }
+
+                        @if ((await AuthorizationService.AuthorizeAsync(User, "Director")).Succeeded)
+                        {
+                            <li><a asp-area="" asp-controller="Gallery" asp-action="OrderFrame">fafa</a></li>
+                        }
                     </ul>
                 </div>
             </div>

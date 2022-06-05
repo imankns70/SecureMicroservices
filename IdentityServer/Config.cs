@@ -17,55 +17,78 @@ namespace IdentityServer
                    {
                        ClientId = "movies_mvc_client",
                        ClientName = "Movies MVC Web App",
-                       AllowedGrantTypes = GrantTypes.Hybrid,
-                       RequirePkce = false,
-                       AllowRememberConsent = false,
-                       RedirectUris = new List<string>()
+                       ClientSecrets =   { new Secret("secret".Sha256()) },
+                       AllowedGrantTypes = GrantTypes.Code,
+                       //RequirePkce = false,
+                       AllowOfflineAccess = true,
+
+                       RequireConsent = true,
+                       RedirectUris =  {"https://localhost:5002/signin-oidc"  },
+                       PostLogoutRedirectUris ={ "https://localhost:5002/signout-callback-oidc" },
+
+                       AllowedScopes =
                        {
-                           "https://localhost:5002/signin-oidc"
-                       },
-                       PostLogoutRedirectUris = new List<string>()
-                       {
-                           "https://localhost:5002/signout-callback-oidc"
-                       },
-                       ClientSecrets = new List<Secret>
-                       {
-                           new Secret("secret".Sha256())
-                       },
-                       AllowedScopes = new List<string>
-                       {
-                           IdentityServerConstants.StandardScopes.OpenId,
-                           IdentityServerConstants.StandardScopes.Profile,
-                           IdentityServerConstants.StandardScopes.Address,
+                           //IdentityServerConstants.StandardScopes.OpenId,
+                           //IdentityServerConstants.StandardScopes.Profile,
+                           //IdentityServerConstants.StandardScopes.Address,
                            //IdentityServerConstants.StandardScopes.Email,
-                           //"movieAPI",
-                           "roles"
+                           "openid",
+                           "profile",
+                           "address",
+                           "email",
+                           "movieAPI.read",
+                           "roles",
+                           "subscriptionlevel"
                        }
                    },
-                   //new Client
-                   //{
-                   //     ClientName="Movies Api",
-                   //     ClientId = "movieClient",
-                   //     AllowedGrantTypes = GrantTypes.ClientCredentials,
-                   //     ClientSecrets =
-                   //     {
-                   //         new Secret("secret".Sha256())
-                   //     },
-                   //     AllowedScopes = { "movieAPI" }
-                   //}
-                   
+                   new Client
+                   {
+                        ClientName="Movies Api",
+                        ClientId = "movieApiClient",
+                        AllowedGrantTypes = GrantTypes.ClientCredentials,
+                        //RequirePkce = false,
+                        //AllowRememberConsent = false,
+                        ClientSecrets =
+                        {
+                            new Secret("secret".Sha256())
+                        },
+                        AllowedScopes = {
+                           //IdentityServerConstants.StandardScopes.OpenId,
+                           //IdentityServerConstants.StandardScopes.Profile,
+                           //IdentityServerConstants.StandardScopes.Address,
+                          //"roles",
+                          //"subscriptionlevel",
+                          "movieAPI.read",
+                          "movieAPI.write",
+
+
+
+                       }
+                   }
+
             };
 
-public static IEnumerable<ApiScope> ApiScopes =>
-           new ApiScope[]
-           {
-               new ApiScope("movieAPI", "Movie API")
-           };
+        public static IEnumerable<ApiScope> ApiScopes =>
+                   new ApiScope[]
+                   {
+                     new ApiScope("movieAPI.read"),
+                     new ApiScope("movieAPI.write"),
+
+                   };
 
         public static IEnumerable<ApiResource> ApiResources =>
-          new ApiResource[]
+          new[]
           {
-              new ApiResource("movieAPI", "Movie API")
+              new ApiResource("movieAPI")
+              {
+                    Scopes = new List<string> { "movieAPI.read", "movieAPI.write"},
+                    ApiSecrets = new List<Secret> {new Secret("ScopeSecret".Sha256())},
+                    UserClaims = new List<string> {"role"}
+              }
+
+
+
+
           };
 
         public static IEnumerable<IdentityResource> IdentityResources =>
@@ -74,11 +97,17 @@ public static IEnumerable<ApiScope> ApiScopes =>
               new IdentityResources.OpenId(),
               new IdentityResources.Profile(),
               new IdentityResources.Address(),
-              //new IdentityResources.Email(),
+              new IdentityResources.Email(),
               new IdentityResource(
                     "roles",
                     "Your role(s)",
-                    new List<string>() { "role" })
+                    new List<string>() { "role" }),
+
+              new IdentityResource(
+                    "subscriptionlevel",
+                    "Your subscription level",
+                    new List<string> { "subscriptionlevel" })
+
           };
 
         public static List<TestUser> TestUsers =>
@@ -94,9 +123,10 @@ public static IEnumerable<ApiScope> ApiScopes =>
                         new Claim(JwtClaimTypes.GivenName, "iman"),
                         new Claim(JwtClaimTypes.FamilyName, "solouki"),
                         new Claim(JwtClaimTypes.Address, "kian shahr 1"),
-                        new Claim(JwtClaimTypes.Role, "admin")
-                        
-                        
+                        new Claim(JwtClaimTypes.Role, "admin"),
+                        new Claim("subscriptionlevel", "a1"),
+
+
                     }
                 },
                 new TestUser
@@ -106,10 +136,27 @@ public static IEnumerable<ApiScope> ApiScopes =>
                     Password = "654321",
                     Claims = new List<Claim>
                     {
+
                         new Claim(JwtClaimTypes.GivenName, "mohsen"),
                         new Claim(JwtClaimTypes.FamilyName, "ghalavand"),
                         new Claim(JwtClaimTypes.Address, "kian shahr 2"),
-                        new Claim(JwtClaimTypes.Role, "b1 user")
+                        new Claim(JwtClaimTypes.Role, "b1_user"),
+                        new Claim("subscriptionlevel", "b1"),
+
+                    }
+                },
+                 new TestUser
+                {
+                    SubjectId = "f9539694-77e7-4dfe-84da-b4256e1ff7hy",
+                    Username = "fafa",
+                    Password = "123456",
+                    Claims = new List<Claim>
+                    {
+                        new Claim(JwtClaimTypes.GivenName, "fafa"),
+                        new Claim(JwtClaimTypes.FamilyName, "alipoor"),
+                        new Claim(JwtClaimTypes.Address, "kian shahr 3"),
+                        new Claim("subscriptionlevel", "c1"),
+
                     }
                 }
             };

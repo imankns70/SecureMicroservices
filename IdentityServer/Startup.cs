@@ -25,9 +25,10 @@ namespace IdentityServer
                 .AddDeveloperSigningCredential()
                 .AddTestUsers(Config.TestUsers)
                 .AddInMemoryIdentityResources(Config.IdentityResources)
-                .AddInMemoryClients(Config.Clients);
-                //.AddInMemoryApiScopes(Config.ApiScopes)
-             
+                .AddInMemoryClients(Config.Clients)
+                .AddInMemoryApiScopes(Config.ApiScopes)
+                .AddInMemoryApiResources(Config.ApiResources);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,7 +45,7 @@ namespace IdentityServer
 
             app.UseIdentityServer();
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

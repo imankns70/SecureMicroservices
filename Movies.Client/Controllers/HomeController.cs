@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Movies.Client.Controllers
@@ -35,12 +36,17 @@ namespace Movies.Client.Controllers
         {
             await WriteOutIdentityInformation();
 
-            
+           // var currentUderId = this.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+
             //var metaDataResponse = await client.;
 
             //OpenIdConnectParameterNames.AccessToken
             //metaDataResponse.
 
+            foreach (var claim in User.Claims)
+            {
+                 
+            }
 
 
             return View();
@@ -65,7 +71,7 @@ namespace Movies.Client.Controllers
             //ILogger is for kestrel console
             // Debug is for visual studio console window
             Debug.WriteLine($"Identity token: {identityToken}");
-            var fff = User.IsInRole("admin");
+       
             foreach (var claim in User.Claims)
             {
                 Debug.WriteLine($"Claim type: {claim.Type} - Claim value: {claim.Value}");
@@ -75,8 +81,11 @@ namespace Movies.Client.Controllers
         public async Task Logout()
         {
 
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+            //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            //await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+
+            await HttpContext.SignOutAsync("cookie");
+            await HttpContext.SignOutAsync("oidc");
         }
 
     }

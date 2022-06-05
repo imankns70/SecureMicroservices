@@ -1,3 +1,6 @@
+using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,6 +15,7 @@ using Microsoft.OpenApi.Models;
 using Movies.API.Data;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,6 +35,7 @@ namespace Movies.API
         {
 
             services.AddControllers();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Movies.API", Version = "v1" });
@@ -39,22 +44,40 @@ namespace Movies.API
             services.AddDbContext<MoviesContext>(options =>
             options.UseInMemoryDatabase("Movies"));
 
+            //services.AddAuthentication(defaultScheme: IdentityServerAuthenticationDefaults.AuthenticationScheme)
+            //   .AddIdentityServerAuthentication(options =>
+            //   {
+            //       options.Authority = Configuration["IDP_EndPoint"];
+            //       options.ApiName = "movieApiClient";
+            //       //options.ApiSecret = "secret";
+            //   });
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                 .AddJwtBearer(options =>
+                 {
+                     options.Authority = Configuration["IDP_EndPoint"];
+                     options.Audience = "movieAPI";
+                     options.TokenValidationParameters.ValidTypes = new[] { "at+jwt" };
+                 });
+
+            services.AddAuthorization(authorizationOptions =>
+            {
+                //ClaimType=client_id
+                //ClaimValue=[movieApiClient,movies_mvc_client]
+                authorizationOptions.AddPolicy("ClientIdPolicy", policy => policy.RequireClaim("client_id", "movieApiClient", "movies_mvc_client"));
+
+                //authorizationOptions.AddPolicy(
+                //    name: "MyOwnPolicy",
+                //    configurePolicy: policyBuilder =>
+                //    {
+                //        policyBuilder.RequireAuthenticatedUser();
+                //        policyBuilder.AddRequirements(new MyOwnAuthorizationRequirement());
+                //    });
+
+            });
+            services.AddScoped<IAuthorizationHandler, MyOwnAuthorizationHandler>();
 
 
-            //services.AddAuthentication("Bearer")
-            //     .AddJwtBearer("Bearer", options =>
-            //     {
-            //         options.Authority = "https://localhost:5005";
-            //         options.TokenValidationParameters = new TokenValidationParameters
-            //         {
-            //             ValidateAudience = false
-            //         };
-            //     });
-
-            //services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("ClientIdPolicy", policy => policy.RequireClaim("client_id", "movieClient", "movies_mvc_client"));
-            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,9 +94,9 @@ namespace Movies.API
 
             app.UseRouting();
 
-            //app.UseAuthentication();
+            app.UseAuthentication();
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

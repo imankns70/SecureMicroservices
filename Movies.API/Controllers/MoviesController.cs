@@ -6,6 +6,7 @@ using Movies.API.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Movies.API.Controllers
@@ -13,7 +14,7 @@ namespace Movies.API.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize("ClientIdPolicy")]
+    [Authorize(policy:"ClientIdPolicy")]
     public class MoviesController : ControllerBase
     {
 
@@ -25,8 +26,12 @@ namespace Movies.API.Controllers
         }
         // GET: api/Movies
         [HttpGet]
+      
         public async Task<ActionResult<IEnumerable<Movie>>> GetMovie()
-        {
+        {          
+        
+            var currentUderId = this.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+
             return await _context.Movie.ToListAsync();
         }
 

@@ -27,6 +27,7 @@ namespace Movies.Client
         {
             Configuration = configuration;
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
         }
 
         public IConfiguration Configuration { get; }
@@ -34,24 +35,27 @@ namespace Movies.Client
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpClient();
-            services.AddHttpContextAccessor();
-            services.AddTransient<AuthenticationDelegatingHandler>();
+            services.AddControllersWithViews();
             services.AddScoped<IMovieApiService, MovieApiService>();
 
-            services.AddControllersWithViews();
+            services.AddTransient<AuthenticationDelegatingHandler>();
+
+            services.AddHttpClient("MovieAPIClient", client =>
+            {
+                client.BaseAddress = new Uri(Configuration["API_EndPoint"]);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+            }).AddHttpMessageHandler<AuthenticationDelegatingHandler>();
+
+
+            services.AddHttpContextAccessor();
+
 
 
             // http operations
 
             // 1 create an HttpClient used for accessing the Movies.API
 
-            //services.AddHttpClient("MovieAPIClient", client =>
-            //{
-            //    client.BaseAddress = new Uri("https://localhost:5010/"); // API GATEWAY URL
-            //    client.DefaultRequestHeaders.Clear();
-            //    client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
-            //}).AddHttpMessageHandler<AuthenticationDelegatingHandler>();
 
 
             //// 2 create an HttpClient used for accessing the IDP
@@ -64,9 +68,9 @@ namespace Movies.Client
 
 
             //services.AddSingleton(new ClientCredentialsTokenRequest
-            //{                                                
+            //{
             //    Address = "https://localhost:5005/connect/token",
-            //    ClientId = "movieClient",
+            //    ClientId = "movieApiClient",
             //    ClientSecret = "secret",
             //    Scope = "movieAPI"
             //});
@@ -76,59 +80,82 @@ namespace Movies.Client
 
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-               
-                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-              
+                //options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                //options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+
+                options.DefaultScheme = "cookie";
+                options.DefaultChallengeScheme = "oidc";
+
             })
-                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                .AddCookie("cookie", options =>
+                //.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
                     options.AccessDeniedPath = "/Authorization/AccessDenied";
-                })              
-                .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
-         
-                {
-                    options.Authority = Configuration["IDP_EndPoint"];
+                })
+                  .AddOpenIdConnect("oidc", options =>
 
-                    options.ClientId = "movies_mvc_client"; 
-                    options.ClientSecret = "secret";
-                    options.ResponseType = "code id_token";
+                  //.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 
-                    options.Scope.Add("openid");
-                    options.Scope.Add("profile");
-                    options.Scope.Add("address");
-                    //options.Scope.Add("email");
-                    options.Scope.Add("roles");
+                  {
+                      options.Authority = Configuration["IDP_EndPoint"];
+                      options.ClientId = "movies_mvc_client";
+                      options.ClientSecret = "secret";
+                      options.ResponseType = "code";
+                      options.ResponseMode = "query";
 
-                    options.ClaimActions.DeleteClaim("address");
-                    //options.ClaimActions.DeleteClaim("sid");
-                    //options.ClaimActions.DeleteClaim("idp");
-                    //options.ClaimActions.DeleteClaim("s_hash");
-                    //options.ClaimActions.DeleteClaim("auth_time");
-                    
+                      options.Scope.Add("openid");
+                      options.Scope.Add("profile");
+                      options.Scope.Add("address");
+                      options.Scope.Add("email");
+                      options.Scope.Add("movieAPI.read");
+                      options.Scope.Add("roles");
+                      options.Scope.Add("subscriptionlevel");
 
-                    // چون جزو کلیم های دیفالت نیست مجبوریم دستی آن را اضافه کنیم
-                    options.ClaimActions.MapUniqueJsonKey("role", "role");
-
-
-                    // for having 2 or more roles
-                    //options.ClaimActions.MapJsonKey(claimType: "role", jsonKey: "role"); 
+                      //options.ClaimActions.DeleteClaim("address");
+                      options.ClaimActions.DeleteClaim("sid");
+                      options.ClaimActions.DeleteClaim("idp");
+                      options.ClaimActions.DeleteClaim("s_hash");
+                      options.ClaimActions.DeleteClaim("auth_time");
 
 
+                      // چون جزو کلیم های دیفالت نیست مجبوریم دستی آن را اضافه کنیم
 
-                    //options.Scope.Add("movieAPI");
+                      options.ClaimActions.MapUniqueJsonKey(claimType: "role", jsonKey: "role");
+                      options.ClaimActions.MapUniqueJsonKey(claimType: "subscriptionlevel", jsonKey: "subscriptionlevel");
 
-                    options.SaveTokens = true;
-                    options.GetClaimsFromUserInfoEndpoint = true;
+                      // for having 2 or more roles
+                      //options.ClaimActions.MapJsonKey(claimType: "role", jsonKey: "role"); 
 
 
-                    // به اطلاع رساندن کاربر جاری تا نقش را از کلیم جاری بخواند
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        NameClaimType = JwtClaimTypes.GivenName,
-                        RoleClaimType = JwtClaimTypes.Role
-                    };
-                });
+
+
+                      options.UsePkce = true;
+                      options.SaveTokens = true;
+                      options.GetClaimsFromUserInfoEndpoint = true;
+
+
+                  // به اطلاع رساندن کاربر جاری تا نقش را از کلیم جاری بخواند
+                  options.TokenValidationParameters = new TokenValidationParameters
+                  {
+                      NameClaimType = JwtClaimTypes.GivenName,
+                      RoleClaimType = JwtClaimTypes.Role,
+
+
+
+                      };
+                  });
+
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(
+                   name: "Director",
+                   configurePolicy: policyBuilder =>
+                   {
+                       policyBuilder.RequireAuthenticatedUser();
+                       policyBuilder.RequireClaim(claimType: "subscriptionlevel", "a1", "b1");
+                   });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

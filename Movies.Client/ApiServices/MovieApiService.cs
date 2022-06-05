@@ -34,42 +34,42 @@ namespace Movies.Client.ApiServices
             ////////////////////////
             // WAY 1 :
 
-            //var httpClient = _httpClientFactory.CreateClient("MovieAPIClient");
+            var httpClient = _httpClientFactory.CreateClient("MovieAPIClient");
 
-            //var request = new HttpRequestMessage(
-            //    HttpMethod.Get,
-            //    "/movies");
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                "api/movies");
 
-            //var response = await httpClient.SendAsync(
-            //    request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            var response = await httpClient.SendAsync(
+                request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
-            //response.EnsureSuccessStatusCode();
+            response.EnsureSuccessStatusCode();
 
-            //var content = await response.Content.ReadAsStringAsync();
-            //var movieList = JsonConvert.DeserializeObject<List<Movie>>(content);
-            //return movieList;
+            var content = await response.Content.ReadAsStringAsync();
+            var movieList = JsonConvert.DeserializeObject<List<Movie>>(content);
+            return movieList;
 
             ////////////////////////// //////////////////////// ////////////////////////
             //// WAY 2 :
 
             //// 1. "retrieve" our api credentials. This must be registered on Identity Server!
-          
+
 
             // creates a new HttpClient to talk to our IdentityServer (localhost:5005)
             //var client = new HttpClient();
 
-         
-          
+
+
             // 4. Send a request to our Protected API
-       
-            var client = _httpClientFactory.CreateClient("apiMovies");
-            var response = await client.GetAsync("https://localhost:5001/api/movies");
-            response.EnsureSuccessStatusCode();
 
-            var content = await response.Content.ReadAsStringAsync();
+            //var client = _httpClientFactory.CreateClient("apiMovies");
+            //var response = await client.GetAsync("https://localhost:5001/api/movies");
+            //response.EnsureSuccessStatusCode();
 
-            var movieList = JsonConvert.DeserializeObject<List<Movie>>(content);
-            return movieList;
+            //var content = await response.Content.ReadAsStringAsync();
+
+            //var movieList = JsonConvert.DeserializeObject<List<Movie>>(content);
+            //return movieList;
 
 
         }
@@ -96,9 +96,9 @@ namespace Movies.Client.ApiServices
 
         public async Task<UserInfoViewModel> GetUserInfo()
         {
-            var idpClient = _httpClientFactory.CreateClient();
+            var httpClient = _httpClientFactory.CreateClient();
 
-            var metaDataResponse = await idpClient.GetDiscoveryDocumentAsync(_configuration["IDP_EndPoint"]);
+            var metaDataResponse = await httpClient.GetDiscoveryDocumentAsync(_configuration["IDP_EndPoint"]);
 
             if (metaDataResponse.IsError)
             {
@@ -108,7 +108,7 @@ namespace Movies.Client.ApiServices
             var accessToken = await _httpContextAccessor
                 .HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
 
-            var userInfoResponse = await idpClient.GetUserInfoAsync(
+            var userInfoResponse = await httpClient.GetUserInfoAsync(
                new UserInfoRequest
                {
                    Address = metaDataResponse.UserInfoEndpoint,
@@ -129,5 +129,7 @@ namespace Movies.Client.ApiServices
 
             return new UserInfoViewModel(userInfoDictionary);
         }
+
+   
     }
 }
