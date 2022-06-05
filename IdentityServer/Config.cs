@@ -56,10 +56,13 @@ namespace IdentityServer
                            //IdentityServerConstants.StandardScopes.OpenId,
                            //IdentityServerConstants.StandardScopes.Profile,
                            //IdentityServerConstants.StandardScopes.Address,
-                          //"roles",
-                          //"subscriptionlevel",
-                          "movieAPI.read",
-                          "movieAPI.write",
+                           "openid",
+                           "profile",
+                           "address",
+                           "email",
+                           "movieAPI.read",
+                           "roles",
+                           "subscriptionlevel"
 
 
 
@@ -83,7 +86,7 @@ namespace IdentityServer
               {
                     Scopes = new List<string> { "movieAPI.read", "movieAPI.write"},
                     ApiSecrets = new List<Secret> {new Secret("ScopeSecret".Sha256())},
-                    UserClaims = new List<string> {"role"}
+                    UserClaims = new List<string> {"role", "subscriptionlevel" }
               }
 
 

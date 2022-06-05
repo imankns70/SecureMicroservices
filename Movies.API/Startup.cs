@@ -26,6 +26,7 @@ namespace Movies.API
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+                //JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
         }
 
         public IConfiguration Configuration { get; }
@@ -43,7 +44,7 @@ namespace Movies.API
 
             services.AddDbContext<MoviesContext>(options =>
             options.UseInMemoryDatabase("Movies"));
-
+            services.AddHttpContextAccessor();
             //services.AddAuthentication(defaultScheme: IdentityServerAuthenticationDefaults.AuthenticationScheme)
             //   .AddIdentityServerAuthentication(options =>
             //   {
@@ -64,15 +65,15 @@ namespace Movies.API
             {
                 //ClaimType=client_id
                 //ClaimValue=[movieApiClient,movies_mvc_client]
-                authorizationOptions.AddPolicy("ClientIdPolicy", policy => policy.RequireClaim("client_id", "movieApiClient", "movies_mvc_client"));
+                //authorizationOptions.AddPolicy("ClientIdPolicy", policy => policy.RequireClaim("client_id", "movieApiClient", "movies_mvc_client"));
 
-                //authorizationOptions.AddPolicy(
-                //    name: "MyOwnPolicy",
-                //    configurePolicy: policyBuilder =>
-                //    {
-                //        policyBuilder.RequireAuthenticatedUser();
-                //        policyBuilder.AddRequirements(new MyOwnAuthorizationRequirement());
-                //    });
+                authorizationOptions.AddPolicy(
+                    name: "SubscriptionLevelPolicy",
+                    configurePolicy: policyBuilder =>
+                    {
+                        policyBuilder.RequireAuthenticatedUser();
+                        policyBuilder.AddRequirements(new MyOwnAuthorizationRequirement());
+                    });
 
             });
             services.AddScoped<IAuthorizationHandler, MyOwnAuthorizationHandler>();
