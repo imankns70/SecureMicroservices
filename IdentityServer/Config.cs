@@ -21,7 +21,9 @@ namespace IdentityServer
                        AllowedGrantTypes = GrantTypes.Code,
                        //RequirePkce = false,
                        AllowOfflineAccess = true,
-
+                       AccessTokenLifetime=120,
+                       ///- در اینجا می‌توان خاصیت UpdateAccessTokenClaimsOnRefresh را نیز به true تنظیم کرد. فرض کنید یکی از Claims کاربر مانند آدرس او تغییر کرده‌است. به صورت پیش‌فرض با درخواست مجدد توکن توسط RefreshToken، این Claims به روز رسانی نمی‌شوند. با تنظیم این خاصیت به true این مشکل برطرف خواهد شد.
+                       UpdateAccessTokenClaimsOnRefresh = true,
                        RequireConsent = true,
                        RedirectUris =  {"https://localhost:5002/signin-oidc"  },
                        PostLogoutRedirectUris ={ "https://localhost:5002/signout-callback-oidc" },
@@ -48,6 +50,7 @@ namespace IdentityServer
                         AllowedGrantTypes = GrantTypes.ClientCredentials,
                         //RequirePkce = false,
                         //AllowRememberConsent = false,
+
                         ClientSecrets =
                         {
                             new Secret("secret".Sha256())

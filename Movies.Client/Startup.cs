@@ -98,8 +98,8 @@ namespace Movies.Client
 
                   {
                       options.Authority = Configuration["IDP_EndPoint"];
-                      options.ClientId = "movies_mvc_client";
-                      options.ClientSecret = "secret";
+                      options.ClientId = Configuration["ClientId"];
+                      options.ClientSecret = Configuration["ClientSecret"];
                       options.ResponseType = "code";
                       options.ResponseMode = "query";
 
@@ -108,6 +108,7 @@ namespace Movies.Client
                       options.Scope.Add("address");
                       options.Scope.Add("email");
                       options.Scope.Add("movieAPI.read");
+                      options.Scope.Add("offline_access");
                       options.Scope.Add("roles");
                       options.Scope.Add("subscriptionlevel");
 
